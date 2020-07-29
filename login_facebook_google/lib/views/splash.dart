@@ -28,7 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
   checkLogin()async{
     await SharedPre.getBoolKey(SharedPre.sharedPreIsLogin).then((value){
-      print("value "+value.toString());
       Future.delayed(Duration(seconds: 3),()async{
         if(value!=null){
           if(value){

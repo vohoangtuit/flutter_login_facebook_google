@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:login_facebook_google/customs_widget/button.dart';
+import 'package:login_facebook_google/utils/constance.dart';
 import 'dart:convert' as JSON;
 
 import 'package:login_facebook_google/utils/shared_preference.dart';
 class LoginScreen extends StatefulWidget {
+  // todo: https://stackoverflow.com/questions/54557479/flutter-and-google-sign-in-plugin-platformexceptionsign-in-failed-com-google
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -14,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final facebookLogin = FacebookLogin();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
@@ -27,26 +31,15 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(width: 200, height: 45,child:
-            RaisedButton(
-              child: Text('Login with Facebook', style: TextStyle(color: Colors.white, fontSize: 18),),
-              color: Colors.blue,
-              shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(8.0)),
-              onPressed: (){
-                _loginWithFacebook();
-              },),
-            ),
+            NormalButton(title:'Login with Facebook' ,onPressed: (){
+              _loginWithFacebook();
+            },),
             SizedBox(height: 30,),
-            SizedBox(width: 200, height: 45,child:
-            RaisedButton(
-              child: Text('Login with Google', style: TextStyle(color: Colors.white, fontSize: 18),),
-              color: Colors.blue,
-              shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(8.0)),
-              onPressed: (){
-              },),
-            ),
+            NormalButton(title:'Login with Google' ,onPressed: (){
+              //_handleSignInGoogle();
+              handleSignIn();
+            },),
+
           ],
         ),
       ),
@@ -77,25 +70,64 @@ class _LoginScreenState extends State<LoginScreen> {
   }
   _getFBProfile(String token)async{
     final graphResponse = await http.get(
-        'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${token}');
+        'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email,picture&access_token=${token}');
     final profile = JSON.jsonDecode(graphResponse.body);
-    print("profile "+profile);
+    print("profile "+profile.toString());
     SharedPre.saveBool(SharedPre.sharedPreIsLogin, true);
     SharedPre.saveString(SharedPre.sharedPreFullName, profile['name']);
     SharedPre.saveString(SharedPre.sharedPreEmail, profile['email']);
-//    {
-//      "name": "Iiro Krankka",
-//    "first_name": "Iiro",
-//    "last_name": "Krankka",
-//    "email": "iiro.krankka\u0040gmail.com",
-//    "id": "<user id here>"
-//  }
+    SharedPre.saveString(SharedPre.sharedPreAvatar, profile['picture']['data']['url']);
+    Navigator.pushReplacementNamed(context, Constance().KEY_PROFILE_SCREEN);
+   // {
+    // name: Võ Hoàng Duy,
+    // first_name: Duy,
+    // last_name: Võ, email:
+    // thanhduoc2504@gmail.com,
+    // picture: {
+              // data: {height: 50, is_silhouette: false,
+              // url: https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=2801695870075695&height=50&width=50&ext=1598582158&hash=AeQBDVywdvmEiyI1, width: 50}}, id: 2801695870075695}
   }
 
+  Future<void> handleSignIn() async {
+    GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+    GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+
+    AuthCredential credential = GoogleAuthProvider.getCredential(
+        idToken: googleSignInAuthentication.idToken,
+        accessToken: googleSignInAuthentication.accessToken);
+
+    AuthResult result = (await _auth.signInWithCredential(credential));
+
+    FirebaseUser _user = result.user;
+
+    if(_user!=null){
+      print("_user email: " + _user.email);
+      SharedPre.saveBool(SharedPre.sharedPreIsLogin, true);
+      SharedPre.saveString(SharedPre.sharedPreFullName, _user.displayName);
+      SharedPre.saveString(SharedPre.sharedPreEmail,_user.email);
+      SharedPre.saveString(SharedPre.sharedPreAvatar,_user.photoUrl);
+      Navigator.pushReplacementNamed(context, Constance().KEY_PROFILE_SCREEN);
+    }
+
+  }
+
+_loginGoogle()async{
+
+  try{
+    await _googleSignIn.signIn();
+    setState(() {
+      //_isLoggedIn = true;
+      print("_googleSignIn "+_googleSignIn.toString());
+    });
+  } catch (err){
+    print(" Error :"+err.toString());
+  }
+}
   Future<FirebaseUser> _handleSignInGoogle() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
     await googleUser.authentication;
+
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
       accessToken: googleAuth.accessToken,
