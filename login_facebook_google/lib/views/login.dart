@@ -43,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       }
     });
-
     _googleSignIn.signInSilently();
   }
 
@@ -129,9 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
   Future<void> _loginGoogle()async{
-    FirebaseAuth.instance.authStateChanges().listen((event) {
-      print(event.email);
-    });
+    // FirebaseAuth.instance.authStateChanges().listen((event) {
+    //   print(event.email);
+    // });
 
     try {
       GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();

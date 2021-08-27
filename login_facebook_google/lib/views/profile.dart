@@ -75,7 +75,7 @@ class _ProFileScreenState extends State<ProFileScreen> {
     await FacebookAuth.instance.logOut();
 
     await SharedPre.clearData();
-    _logOut();
+    await _logOut();
     Navigator.pushReplacementNamed(context, Constance().KEY_LOGIN_SCREEN);
 
   }
@@ -83,6 +83,5 @@ class _ProFileScreenState extends State<ProFileScreen> {
    await FacebookAuth.instance.logOut();
     GoogleSignIn _googleSignIn = GoogleSignIn();
    _googleSignIn.signOut();
-   _googleSignIn.disconnect();
  }
 }
