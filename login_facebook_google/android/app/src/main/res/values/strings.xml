@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Social Network</string>
-    <string name="facebook_app_id">757901591612156</string>
-    <string name="fb_login_protocol_scheme">fb757901591612156</string>
+    <string name="facebook_app_id">269887758011338</string>
+    <string name="fb_login_protocol_scheme">269887758011338</string>
 </resources>

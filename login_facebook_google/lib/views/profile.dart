@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login_facebook_google/customs_widget/button.dart';
 import 'package:login_facebook_google/customs_widget/text_style.dart';
 import 'package:login_facebook_google/utils/constance.dart';
@@ -70,7 +72,17 @@ class _ProFileScreenState extends State<ProFileScreen> {
 
   }
   _handleLogout()async{
+    await FacebookAuth.instance.logOut();
+
     await SharedPre.clearData();
+    _logOut();
     Navigator.pushReplacementNamed(context, Constance().KEY_LOGIN_SCREEN);
+
   }
+ Future<void> _logOut() async {
+   await FacebookAuth.instance.logOut();
+    GoogleSignIn _googleSignIn = GoogleSignIn();
+   _googleSignIn.signOut();
+   _googleSignIn.disconnect();
+ }
 }

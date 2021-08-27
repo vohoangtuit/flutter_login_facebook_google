@@ -1,10 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:login_facebook_google/utils/constance.dart';
 import 'package:login_facebook_google/views/login.dart';
 import 'package:login_facebook_google/views/profile.dart';
 import 'package:login_facebook_google/views/splash.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 

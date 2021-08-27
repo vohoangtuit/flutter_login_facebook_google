@@ -1,0 +1,4 @@
+LoginSocial
+pass all: 24011990
+
+/Users/vohoangtuit/DATA/DEVELOP/PROJECT/flutter_login_fb_gg/login_facebook_google/android/keystore/keystoreApp
