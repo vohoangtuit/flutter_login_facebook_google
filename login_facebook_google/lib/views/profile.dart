@@ -12,9 +12,9 @@ class ProFileScreen extends StatefulWidget {
 }
 
 class _ProFileScreenState extends State<ProFileScreen> {
- String name="";
- String email="";
- String avatar="";
+ String? name="";
+ String? email="";
+ String? avatar="";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,8 +24,8 @@ class _ProFileScreenState extends State<ProFileScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-              child: avatar.isEmpty?Text('....'):
-              Container(height: 200,width: 200,decoration: BoxDecoration(shape: BoxShape.circle,image: DecorationImage(fit: BoxFit.fill,image: NetworkImage(avatar))),),
+              child: avatar!.isEmpty?Text('....'):
+              Container(height: 200,width: 200,decoration: BoxDecoration(shape: BoxShape.circle,image: DecorationImage(fit: BoxFit.fill,image: NetworkImage(avatar!))),),
             ),
             SizedBox(height: 20,),
             Text('Name: $name',style: textBlueDefault(),),
@@ -59,10 +59,10 @@ class _ProFileScreenState extends State<ProFileScreen> {
       })
     });
     await SharedPre.getStringKey(SharedPre.sharedPreAvatar).then((value) => {
-      if(value.isNotEmpty){
+      if(value!.isNotEmpty){
         setState(() {
           avatar =value;
-          print("avatar "+avatar);
+          print("avatar "+avatar!);
         })
       }else{
         print("avatar is null ")
@@ -72,14 +72,15 @@ class _ProFileScreenState extends State<ProFileScreen> {
 
   }
   _handleLogout()async{
-    await FacebookAuth.instance.logOut();
 
     await SharedPre.clearData();
     await _logOut();
-    Navigator.pushReplacementNamed(context, Constance().KEY_LOGIN_SCREEN);
+   // Navigator.pushReplacementNamed(context, Constance().KEY_LOGIN_SCREEN);
+    Navigator.pushReplacementNamed(context, '/');
 
   }
  Future<void> _logOut() async {
+
    await FacebookAuth.instance.logOut();
     GoogleSignIn _googleSignIn = GoogleSignIn();
    _googleSignIn.signOut();

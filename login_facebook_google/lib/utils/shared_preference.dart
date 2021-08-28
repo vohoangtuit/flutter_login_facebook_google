@@ -14,12 +14,12 @@ class SharedPre {
     return await sharedPreferences.setString(key, value);
   }
 
-  static Future<bool> getBoolKey(String key) async{
+  static Future<bool?> getBoolKey(String key) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.getBool(key);
   }
 
-  static Future<String> getStringKey(String key) async{
+  static Future<String?> getStringKey(String key) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.getString(key);
   }

@@ -6,7 +6,7 @@ class NormalButton extends StatelessWidget {
 
   final String title;
 
-  NormalButton({@required this.onPressed,@required this.title});
+  NormalButton({required this.onPressed,required this.title});
 
   @override
   Widget build(BuildContext context) {

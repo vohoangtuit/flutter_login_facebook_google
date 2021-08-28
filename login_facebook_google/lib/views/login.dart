@@ -20,11 +20,11 @@ class _LoginScreenState extends State<LoginScreen> {
   // todo google
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email','https://www.googleapis.com/auth/contacts.readonly']);
-  GoogleSignInAccount _currentUser;
+  GoogleSignInAccount? _currentUser;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   // todo facebook
-  Map<String, dynamic> _userData;
-  AccessToken _accessToken;
+  Map<String, dynamic>? _userData;
+  AccessToken? _accessToken;
 
 
   @override
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _initGoogle();
   }
   _initGoogle(){
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
       setState(() {
         _currentUser = account;
       });
@@ -46,18 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _googleSignIn.signInSilently();
   }
 
-  Future<void> _innitFacebook() async {
-    final accessToken = await FacebookAuth.instance.accessToken;
-    if (accessToken != null) {
-      // now you can call to  FacebookAuth.instance.getUserData();
-      final userData = await FacebookAuth.instance.getUserData();
-      // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
-      _accessToken = accessToken;
-      setState(() {
-        _userData = userData;
-      });
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +73,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
     );
   }
+  Future<void> _innitFacebook() async {
+    final accessToken = await FacebookAuth.instance.accessToken;
+
+    if (accessToken != null) {
+      print('accessToken $accessToken');
+      FacebookAuth.instance.logOut();// disconnect user
+      // // now you can call to  FacebookAuth.instance.getUserData();
+      // final userData = await FacebookAuth.instance.getUserData();
+      // // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
+      // _accessToken = accessToken;
+      // setState(() {
+      //   _userData = userData;
+      // });
+    }else{
+      print('accessToken null');
+    }
+  }
   Future<void> _loginFB() async {
+
     final LoginResult result = await FacebookAuth.instance.login(); // by default we request the email and the public profile
 
     // loginBehavior is only supported for Android devices, for ios it will be ignored
@@ -103,10 +110,10 @@ class _LoginScreenState extends State<LoginScreen> {
       // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
       _userData = userData;
       print('_userData ${_userData}');
-      print('token ${_accessToken.token}');
+      print('token ${_accessToken!.token}');
     //  print('token ${_accessToken.}');
 
-      _getFBProfile(_accessToken.token);
+      _getFBProfile(_accessToken!.token);
     } else {
       print(result.status);
       print(result.message);
@@ -133,22 +140,23 @@ class _LoginScreenState extends State<LoginScreen> {
     // });
 
     try {
-      GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
-      GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+      GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+   //   GoogleSignInAccount googleSignInAccount = await (_googleSignIn.signIn() as FutureOr<GoogleSignInAccount>);
+      GoogleSignInAuthentication? googleSignInAuthentication = await googleSignInAccount!.authentication;
       AuthCredential credential = GoogleAuthProvider.credential(
           idToken: googleSignInAuthentication.idToken,
           accessToken: googleSignInAuthentication.accessToken);
 
       final UserCredential authResult =
       await _auth.signInWithCredential(credential);
-      final User user = authResult.user;
+      final User? user = authResult.user;
       print('user $user');
       if(user!=null){
-        print("_user email: " + user.email);
+        print("_user email: " + user.email!);
         SharedPre.saveBool(SharedPre.sharedPreIsLogin, true);
-        SharedPre.saveString(SharedPre.sharedPreFullName, user.displayName);
-        SharedPre.saveString(SharedPre.sharedPreEmail,user.email);
-        SharedPre.saveString(SharedPre.sharedPreAvatar,user.photoURL);
+        SharedPre.saveString(SharedPre.sharedPreFullName, user.displayName!);
+        SharedPre.saveString(SharedPre.sharedPreEmail,user.email!);
+        SharedPre.saveString(SharedPre.sharedPreAvatar,user.photoURL!);
         Navigator.pushReplacementNamed(context, Constance().KEY_PROFILE_SCREEN);
       }
     } catch (error) {
